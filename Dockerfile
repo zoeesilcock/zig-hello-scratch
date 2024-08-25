@@ -8,7 +8,7 @@ COPY ./src/* ./src
 COPY ./build.zig .
 COPY ./build.zig.zon .
 
-RUN zig build
+RUN zig build -Doptimize=ReleaseFast
 
 FROM scratch
 
