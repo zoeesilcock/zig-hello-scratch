@@ -14,6 +14,7 @@ RUN echo "appuser:x:10001:10001:App User:/:/sbin/nologin" > /etc/minimal-passwd
 
 FROM scratch
 
+WORKDIR /opt/bin/app
 COPY --from=builder /opt/src/app/zig-out/bin/zig-hello-scratch /opt/bin/app/
 
 COPY --from=builder /etc/minimal-passwd /etc/passwd

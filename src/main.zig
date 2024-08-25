@@ -1,19 +1,29 @@
 const std = @import("std");
 
 pub fn main() !void {
-    // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
-    std.debug.print("Hello {s}!\n", .{"World"});
-
-    // stdout is for the actual output of your application, for example if you
-    // are implementing gzip, then only the compressed bytes should be sent to
-    // stdout, not any debugging messages.
     const stdout_file = std.io.getStdOut().writer();
     var bw = std.io.bufferedWriter(stdout_file);
     const stdout = bw.writer();
 
-    try stdout.print("Run `zig build test` to run the tests.\n", .{});
+    const uname = std.posix.uname();
 
-    try bw.flush(); // don't forget to flush!
+    var hostname_buffer: [std.posix.HOST_NAME_MAX]u8 = undefined;
+    const hostname = try std.posix.gethostname(&hostname_buffer);
+
+    var cwd_buffer: [std.fs.MAX_PATH_BYTES]u8 = undefined;
+    const cwd = try std.posix.getcwd(&cwd_buffer);
+
+    try stdout.print(
+        "Welcome to Zig Hello Scratch.\nHostname: {s}\nWorkin directory: {s}\nSystem: {s}, {s}, {s}\nArchitecture: {s}\n\n",
+        .{hostname, cwd, uname.sysname, uname.release, uname.version, uname.machine},
+    );
+
+    var index: u32 = 0;
+    while (true) : (index += 1) {
+        try stdout.print("Output {d}.\n", .{index});
+        try bw.flush(); // don't forget to flush!
+        std.posix.nanosleep(2, 0);
+    }
 }
 
 test "simple test" {
